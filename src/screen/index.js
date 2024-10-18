@@ -7,6 +7,9 @@ import Aduan from './Aduan';
 import Perlengkapan from './Perlengkapan';
 import Notif from './Notif';
 import aduan_histori from './aduan_histori';
+import FormPinjam from './formPinjam';
+import Info from './info';
+import Sukses from './sukses';
 
 export {
     Beranda,
@@ -16,7 +19,10 @@ export {
     Aduan,
     Perlengkapan,
     Notif,
-    aduan_histori
+    aduan_histori,
+    FormPinjam,
+    Info,
+    Sukses
 }
 
 

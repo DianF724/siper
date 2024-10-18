@@ -6,7 +6,6 @@ import { useFonts } from 'expo-font'; // Import font loading
 
 export default function NotifScreen() {
   const navigation = useNavigation();
-  const [searchTerm, setSearchTerm] = useState(''); // State untuk menyimpan input pencarian
   const [fontsLoaded] = useFonts({
     'Poppins': require('./assets/fonts/Poppins-Regular.ttf'), // Ensure the path is correct
     'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'), // If you use bold as well
@@ -48,6 +47,9 @@ export default function NotifScreen() {
       <View style={styles.header}>
         <Icon name="arrow-back" size={24} color="white" style={styles.icon} 
           onPress={() => navigation.goBack()} 
+        />
+        <Icon name="home-outline" size={24} color="white" style={styles.icon} 
+          onPress={() => navigation.navigate('Beranda')} 
         />
       </View>
 

@@ -71,7 +71,7 @@ export default function PinjamScreen() {
                 <Text style={styles.roomCampus}>Kampus: Kampus A</Text>
               </View>
 
-              <TouchableOpacity style={styles.borrowButton}>
+              <TouchableOpacity style={styles.borrowButton} onPress={() => navigation.navigate('FormPinjam')}>
                 <Icon name="book-outline" size={24} color="white" padding={5} />
               </TouchableOpacity>
 
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     marginTop: 60,
-    marginBottom: 60,
+    marginBottom: 40,
     marginHorizontal: 10,
     backgroundColor: '#f0f0f0',
     borderRadius: 20,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   icon: {
     padding: 10,
     marginTop: 60,
-    marginBottom: 60,
+    marginBottom: 40,
   },
   contentContainer: {
     flex: 1,

@@ -34,7 +34,7 @@ export default function HomeScreen() {
 
           {/* Gambar Rumah */}
           <Image
-            source={require('./images/fasilkom.png')} // Ganti dengan jalur ke gambar rumah yang benar
+            source={require('./images/lg.jpg')} // Ganti dengan jalur ke gambar rumah yang benar
             style={styles.houseImage}
           />
         </View>
@@ -49,9 +49,9 @@ export default function HomeScreen() {
               <Icon name="book-outline" size={30} color="white" />
               <Text style={styles.buttonText}>Peminjaman Ruangan</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('Laporan')}>
-              <Icon name="document-text-outline" size={30} color="white" />
-              <Text style={styles.buttonText}>Laporan Ruangan</Text>
+            <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('Histori')}>
+              <Icon name="time-outline" size={30} color="white" />
+              <Text style={styles.buttonText}>Histori Laporan</Text>
             </TouchableOpacity>
           </View>
 

@@ -1,21 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native'; 
 import { Picker } from '@react-native-picker/picker'; // Pastikan untuk menginstal react-native-picker
 
 export default function AduanScreen() {
-  const navigation = useNavigation();
-  const [selectedRoom, setSelectedRoom] = useState(); // Untuk menangani pilihan dropdown
-  const [description, setDescription] = useState('');  // Untuk menangani input textarea
-
-  const handleSubmit = () => {
-    // Tambahkan logika untuk menangani pengiriman form
-    console.log("Ruangan:", selectedRoom);
-    console.log("Deskripsi:", description);
-    // Bisa dihubungkan ke API atau aksi lainnya
-    alert("Pengaduan terkirim!");
-  };
+  
+    const [selectedRoom, setSelectedRoom] = useState('');
+    const [description, setDescription] = useState('');
+    const navigation = useNavigation();
+  
+    const handleSubmit = () => {
+      // Tambahkan logika untuk menangani pengiriman form
+      console.log("Ruangan:", selectedRoom);
+      console.log("Deskripsi:", description);
+  
+      // Menampilkan alert dengan tombol OK yang mengarahkan ke halaman Histori
+      Alert.alert(
+        'Pengaduan Terkirim!',
+        'Pengaduan Anda telah berhasil dikirim.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Histori', { status: 'active' }), // Navigasi ke halaman Histori dengan parameter 'active'
+          },
+        ],
+        { cancelable: false } 
+      );
+    };
 
   return (
     <View style={styles.container}>
@@ -115,18 +127,17 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   titleContainer: {
-    width: '50%',
+    width: '55%',
     alignItems: 'center',
     backgroundColor: 'white',
-    paddingVertical: 10,
+    paddingVertical: 5,
     borderRadius: 20,
     marginBottom: 20,
   },
   titleText: {
     color: 'black',
     fontSize: 18,
-    fontWeight: 'bold',
-    fontFamily: 'Poppins',
+    fontFamily: 'Poppins-Bold',
   },
   whiteContainer: {
     width: '100%',
@@ -184,7 +195,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
   },
   submitButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#22ce83',
     paddingVertical: 15,
     paddingHorizontal: 100,
     borderRadius: 10,

@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons'; // Ikon untuk navbar
 import { View, ActivityIndicator } from 'react-native';
 
 // Mengimpor screen dari file lain
-import { Beranda, Histori, Pinjam, Laporan, Aduan, Perlengkapan, Notif, aduan_histori } from './screen'; // Ganti sesuai jalur file Beranda.js, Histori.js, Pinjam.js
+import { Beranda, Histori, Pinjam, Laporan, Aduan, Perlengkapan, Notif, aduan_histori, FormPinjam, Info, Sukses } from './screen'; // Ganti sesuai jalur file Beranda.js, Histori.js, Pinjam.js
 
 
 const Tab = createBottomTabNavigator();
@@ -25,8 +25,8 @@ function TabNavigator() {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Pinjam') {
             iconName = focused ? 'book' : 'book-outline';
-          } else if (route.name === 'Histori') {
-            iconName = focused ? 'time' : 'time-outline';
+          } else if (route.name === 'Aduan') {
+            iconName = focused ? 'megaphone' : 'megaphone-outline';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -56,8 +56,8 @@ function TabNavigator() {
         options={{ headerShown: false }} 
       />
       <Tab.Screen 
-        name="Histori" 
-        component={Histori} 
+        name="Aduan" 
+        component={Aduan} 
         options={{ headerShown: false }} 
       />
     </Tab.Navigator>
@@ -91,6 +91,7 @@ export default function App() {
         <Stack.Screen 
           name="Pinjam" 
           component={Pinjam} 
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Laporan" 
@@ -98,8 +99,8 @@ export default function App() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="Aduan" 
-          component={Aduan} 
+          name="Histori" 
+          component={Histori} 
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
@@ -115,6 +116,21 @@ export default function App() {
         <Stack.Screen 
           name="aduan_histori" 
           component={aduan_histori} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="FormPinjam" 
+          component={FormPinjam} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Info" 
+          component={Info} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Sukses" 
+          component={Sukses} 
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>
