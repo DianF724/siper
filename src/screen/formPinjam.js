@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Import Ionicons for icons
 import { useFonts } from 'expo-font';
 import { ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import * as DocumentPicker from 'expo-document-picker';
 
 
 export default function FormPinjam() {
@@ -17,16 +18,24 @@ export default function FormPinjam() {
     return <ActivityIndicator size="large" color="#2fa5d8" />;
   }
 
-  const [fileResponse, setFileResponse] = useState(null);
 
-  // Function to handle file selection
+
  
+  const pickDocument = async () => {
+    try {
+      let result = await DocumentPicker.getDocumentAsync({});
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
-        <Icon name="arrow-back" size={24} color="white" style={styles.icon2} onPress={() => navigation.navigate('Pinjam')}/>
+        <Icon name="arrow-back" size={24} color="white" style={styles.icon2} onPress={() => navigation.navigate('Pinjam')} />
       </View>
 
       {/* Form Container */}
@@ -85,7 +94,7 @@ export default function FormPinjam() {
         </View>
 
         {/* Upload Button */}
-        <TouchableOpacity style={styles.uploadButton}>
+        <TouchableOpacity style={styles.uploadButton} onPress={pickDocument}>
           <Text style={styles.uploadButtonText}>UPLOAD SURAT REKOMENDASI</Text>
         </TouchableOpacity>
 
@@ -114,8 +123,8 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomLeftRadius:40,
-    borderBottomRightRadius:40,
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
   },
   headerText: {
     color: 'black',
@@ -145,7 +154,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
-    
+
   },
   icon2: {
     marginRight: 10,

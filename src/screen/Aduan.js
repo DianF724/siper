@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker'; 
 import { Picker } from '@react-native-picker/picker'; // Pastikan untuk menginstal react-native-picker
 
 export default function AduanScreen() {
-  
+  const [image, setImage] = useState(null);
+
+  // Request permission to access media library
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Maaf, kami membutuhkan perizinan akses kamera agar dapat bekerja!');
+        }
+      }
+    })();
+  }, []);
+
+  const pickImage = async () => {
+    // Open image picker
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);  // For SDK 48+ (new asset management)
+    }
+  };
     const [selectedRoom, setSelectedRoom] = useState('');
     const [description, setDescription] = useState('');
     const navigation = useNavigation();
@@ -83,9 +112,9 @@ export default function AduanScreen() {
         {/* Kontainer untuk upload dokumen */}
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Upload Dokumen</Text>
-          <TouchableOpacity style={styles.uploadButton}>
+          <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
             <Icon name="cloud-upload-outline" size={24} color="white" />
-            <Text style={styles.uploadButtonText}>Unggah Bukti Foto</Text>
+            <Text style={styles.uploadButtonText}> Bukti FotUnggaho</Text>
           </TouchableOpacity>
         </View>
 
