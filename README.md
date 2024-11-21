@@ -1,7 +1,6 @@
-"# siper" 
 # Sistem Pengelolaan Ruangan
 
-Selamat datang pada *Repository* **Sistem Pengelolaan Ruangan Fakultas Ilmu Komputer**! 
+Selamat datang pada *Repository* **Sistem Pengelolaan Ruangan Fakultas Ilmu Komputer**! <br>
 Tujuan dibuatnya repository untuk Sistem Pengelolaan Ruangan adalah untuk menyediakan tempat **Terpusat** bagi penyimpanan dan pengelolaan kode sumber, dokumentasi dan riwayat perubahan proyek secara **Sistematis**
 
 ## Contributor
