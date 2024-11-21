@@ -43,3 +43,14 @@ Here's a description of the Streamlit functions and features that were created f
 - **Babel**
 - **JavaScript**
 - **TypeScript**
+
+## Setup
+
+1. Clone the repository:
+    bash
+    git clone https://github.com/DianF724/siper.git
+
+2. Install the required dependencies:
+    bash
+    pip install -r requirements.txt
+
