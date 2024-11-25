@@ -1,35 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // For icons
 import { useNavigation } from '@react-navigation/native';
-import { useFonts } from 'expo-font'; 
+import { useFonts } from 'expo-font';
+import { ref, onValue } from 'firebase/database';
+import { database } from '../../src/screen/firebase.js';
 
 export default function HistoriScreen() {
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('peminjaman');
-  const [fontsLoaded] = useFonts({
-    'Poppins': require('./assets/fonts/Poppins-Regular.ttf'), 
-    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'), 
-  }); 
+  const [borrowData, setBorrowData] = useState([]); // State for borrowing history
+  const [reportData, setReportData] = useState([]); // State for complaint history
+  const [loading, setLoading] = useState(true); // State for loading indicator
 
-  if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#2fa5d8" />; // Show loading indicator
+  const [fontsLoaded] = useFonts({
+    'Poppins': require('./assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+  });
+
+  useEffect(() => {
+    // Fetch borrowing data
+    const borrowRef = ref(database, 'data_peminjaman');
+    const unsubscribeBorrow = onValue(borrowRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const formattedBorrowData = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setBorrowData(formattedBorrowData);
+      }
+      setLoading(false);
+    });
+
+    // Fetch report data
+    const reportRef = ref(database, 'data_aduan');
+    const unsubscribeReport = onValue(reportRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const formattedReportData = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setReportData(formattedReportData);
+      }
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribeBorrow();
+      unsubscribeReport();
+    };
+  }, []);
+
+  if (!fontsLoaded || loading) {
+    return <ActivityIndicator size="large" color="#2fa5d8" style={{ flex: 1, justifyContent: 'center' }} />;
   }
 
   return (
     <View style={styles.container}>
       {/* Header section */}
       <View style={styles.header}>
-        <Icon name="arrow-back" size={24} color="white" style={styles.icon} 
-          onPress={() => navigation.goBack()} 
+        <Icon
+          name="arrow-back"
+          size={24}
+          color="white"
+          style={styles.icon}
+          onPress={() => navigation.goBack()}
         />
         <TextInput
           style={styles.searchInput}
           placeholder="Cari di sini..."
           placeholderTextColor="#999"
         />
-        <Icon name="notifications-outline" size={24} color="white" style={styles.icon} 
-          onPress={() => navigation.navigate('Notif')} 
+        <Icon
+          name="notifications-outline"
+          size={24}
+          color="white"
+          style={styles.icon}
+          onPress={() => navigation.navigate('Notif')}
         />
       </View>
 
@@ -37,7 +86,7 @@ export default function HistoriScreen() {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.titleButton, activeTab === 'peminjaman' ? styles.activeTab : styles.inactiveTab]}
-          onPress={() => setActiveTab('peminjaman')} // Set active tab to 'peminjaman'
+          onPress={() => setActiveTab('peminjaman')}
         >
           <Text style={[styles.buttonText, activeTab === 'peminjaman' ? styles.activeText : styles.inactiveText]}>
             Histori Peminjaman
@@ -46,7 +95,7 @@ export default function HistoriScreen() {
 
         <TouchableOpacity
           style={[styles.aduanButton, activeTab === 'pengaduan' ? styles.activeTab : styles.inactiveTab]}
-          onPress={() => setActiveTab('pengaduan')} // Set active tab to 'pengaduan'
+          onPress={() => setActiveTab('pengaduan')}
         >
           <Text style={[styles.buttonText, activeTab === 'pengaduan' ? styles.activeText : styles.inactiveText]}>
             Histori Pengaduan
@@ -57,84 +106,197 @@ export default function HistoriScreen() {
       {/* Main content (history list) */}
       <ScrollView style={styles.scrollView}>
         {activeTab === 'peminjaman' ? (
-          // Content for Borrowing History
-          <>
-            <View style={styles.card}>
-              <Text style={styles.cardText}>Peminjaman #03</Text>
-              <Text style={styles.cardDetail}>Ruang: D 1.1</Text>
-              <Text style={styles.cardDetail}>Waktu Peminjaman: 21/02/2024 09:00</Text>
-              <Text style={styles.cardDetail}>Waktu Pengembalian: 21/02/2024 14:00</Text>
-              <View style={styles.statusContainer('Menunggu Konfirmasi')}>
-                <Text style={styles.cardStatus}>Menunggu Konfirmasi</Text>
+          borrowData.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Icon name="person-circle-outline" size={24} color="white" style={styles.userIcon} />
+                <Text style={styles.cardText}>{item.judul || `Peminjaman #${item.id}`}</Text>
               </View>
-            </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardText}>Peminjaman #02</Text>
-              <Text style={styles.cardDetail}>Ruang: D 1.3</Text>
-              <Text style={styles.cardDetail}>Waktu Peminjaman: 19/02/2024 09:00</Text>
-              <Text style={styles.cardDetail}>Waktu Pengembalian: 19/02/2024 14:00</Text>
-              <View style={styles.statusContainer('Telah Dikonfirmasi')}>
-                <Text style={styles.cardStatus}>Telah Dikonfirmasi</Text>
-              </View>
-            </View>
+              <View style={styles.tableContainer}>
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Ruang:</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>{item.ruangan}</Text>
+                  </View>
+                </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardText}>Peminjaman #01</Text>
-              <Text style={styles.cardDetail}>Ruang: Advancing Class Lt.1</Text>
-              <Text style={styles.cardDetail}>Waktu Peminjaman: 18/02/2024 08:00</Text>
-              <Text style={styles.cardDetail}>Waktu Pengembalian: 18/02/2024 14:00</Text>
-              <View style={styles.statusContainer('Telah Dikonfirmasi')}>
-                <Text style={styles.cardStatus}>Telah Dikonfirmasi</Text>
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Waktu Pinjam:</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>{item.tgl_pinjam}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Waktu Pengembalian:</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>{item.tgl_pengembalian}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.statusContainer(item.status_pinjam)}>
+                    <Text style={styles.cardStatus}>{item.status_pinjam}</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+
+                  </View>
+                </View>
               </View>
             </View>
-          </>
+          ))
         ) : (
-          // Content for Complaint History
-          <>
-            <View style={styles.card}>
+          reportData.map((item) => (
+            <View key={item.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <Icon name="person-circle-outline" size={24} color="white" style={styles.userIcon} />
-                <Text style={styles.cardText}>Pengaduan #02</Text>
+                <Text style={styles.cardText}>{item.judul || `Pengaduan #${item.id}`}</Text>
               </View>
-              <Text style={styles.cardDetail2}>Ruang      : D 1.2</Text>
-              <Text style={styles.cardDetail2}>Masalah   : AC tidak menyala, tolong benarkan</Text>
-              <Text style={styles.cardDetail2}>Bukti       : image.png</Text>
 
-              {/* Status and Date at the bottom */}
-              <View style={styles.cardFooter2}>
-                <Text style={styles.cardDate}>23/02/2024</Text>
-                <View style={styles.statusContainer('Sedang Ditindaklanjuti')}>
-                  <Text style={styles.cardStatus2}>Sedang Ditindaklanjuti</Text>
+              {/* Tabel dengan Dua Kolom */}
+              <View style={styles.tableContainer}>
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Ruang:</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>{item.ruangan}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Masalah:</Text>
+                  </View>
+                  {/* Kolom Kanan */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardStatus2}>{item.isi_aduan}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Bukti:</Text>
+                  </View>
+                  {/* Kolom Kanan Kosong */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>{item.bukti_foto || '-'}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardDetail2}>Tanggal:</Text>
+                  </View>
+                  {/* Kolom Kanan Kosong */}
+                  <View style={styles.tableColumn}>
+                    <Text style={styles.cardStatus2}>{item.waktu}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.tableRow}>
+                  {/* Kolom Kiri */}
+                  <View style={styles.tableColumn}>
+                    
+                  </View>
+                  {/* Kolom Kanan Kosong */}
+                  <View style={styles.tableColumn}>
+                    <View style={styles.statusContainer(item.status_aduan)}>
+                      <Text style={styles.cardStatus}>{item.status_aduan}</Text>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>
 
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Icon name="person-circle-outline" size={24} color="white" style={styles.userIcon} />
-                <Text style={styles.cardText}>Pengaduan #01</Text>
-              </View>
-              <Text style={styles.cardDetail2}>Ruang      : D 1.2</Text>
-              <Text style={styles.cardDetail2}>Masalah   : AC tidak menyala, tolong benarkan</Text>
-              <Text style={styles.cardDetail2}>Bukti       : image.png</Text>
 
-              {/* Status and Date at the bottom */}
-              <View style={styles.cardFooter2}>
-                <Text style={styles.cardDate}>23/02/2024</Text>
-                <View style={styles.statusContainer('Sedang Ditindaklanjuti')}>
-                  <Text style={styles.cardStatus2}>Sedang Ditindaklanjuti</Text>
-                </View>
-              </View>
-            </View>
-          </>
+
+
+          ))
         )}
       </ScrollView>
     </View>
   );
 }
 
+
+
+
 const styles = StyleSheet.create({
+
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  userIcon: {
+    marginRight: 8,
+  },
+  cardText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  tableContainer: {
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    paddingTop: 8,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  tableColumn: {
+    flex: 1,
+    paddingHorizontal: 4,
+
+  },
+  statusContainer: (status) => ({
+    backgroundColor: status === 'active' ? '#4CAF50' : '#FF9800',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginTop: 4,
+  }),
+  cardStatus2: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#2fa5d8',
@@ -226,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   statusContainer: (status) => ({
-    backgroundColor: status === 'Menunggu Konfirmasi' ? '#FFB233' : '#A1C63D' ,
+    backgroundColor: status === 'Menunggu Konfirmasi' ? '#FFB233' : '#A1C63D',
     borderRadius: 10,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -263,5 +425,6 @@ const styles = StyleSheet.create({
   cardStatus2: {
     color: 'white',
     fontFamily: 'Poppins-Bold',
+    marginTop: 5
   },
 });

@@ -1,41 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // For icons
-import { useFonts } from 'expo-font'; 
-import { useNavigation } from '@react-navigation/native'; 
-import { ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useFonts } from 'expo-font';
+import { useNavigation } from '@react-navigation/native';
+import { ref, onValue } from 'firebase/database';
+import { database } from '../../src/screen/firebase.js';
 
 export default function PerlengkapanScreen() {
   const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('kelas'); // State to manage active tab
+  const [ruangan, setRooms] = useState([]);
   const [fontsLoaded] = useFonts({
-    'Poppins': require('./assets/fonts/Poppins-Regular.ttf'),
-    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+    'Poppins': require('../../src/assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Bold': require('../../src/assets/fonts/Poppins-Bold.ttf'),
   });
 
   if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#2fa5d8" />; // Show loading indicator
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#2fa5d8" />
+      </View>
+    );
   }
+
+  useEffect(() => {
+    const roomRef = ref(database, 'ruangan'); // Reference to the "ruangan" collection
+    const unsubscribe = onValue(roomRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Convert data into array
+        const roomList = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        setRooms(roomList);
+      }
+    });
+
+    return () => unsubscribe(); // Clean up listener on unmount
+  }, []);
+
+  // Filter rooms based on activeTab
+  const filteredRuangan = ruangan.filter((ruangan) => ruangan.jenis_ruang === activeTab);
 
   return (
     <View style={styles.container}>
       {/* First Container - Header */}
       <View style={styles.headerContainer}>
-      <Icon name="arrow-back" size={24} color="white" style={styles.icon} 
-        onPress={() => navigation.navigate('Beranda')}/>
+        <Icon name="arrow-back" size={24} color="white" style={styles.icon}
+          onPress={() => navigation.navigate('Beranda')} />
         <TextInput
           style={styles.searchInput}
           placeholder="Cari di sini..."
           placeholderTextColor="#999"
         />
-        <Icon name="notifications-outline" size={24} color="white" style={styles.icon} 
-        onPress={() => navigation.navigate('Notif')}/>
+        <Icon name="notifications-outline" size={24} color="white" style={styles.icon}
+          onPress={() => navigation.navigate('Notif')} />
       </View>
 
       {/* Second Container - Main Content */}
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Pilih Ruangan</Text>
-        
+
         {/* Button Row for Ruang Kelas and Ruang Meeting */}
         <View style={styles.buttonRow}>
           <TouchableOpacity
@@ -57,24 +83,24 @@ export default function PerlengkapanScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Room List */}
         <ScrollView style={styles.scrollView}>
-          {[...Array(5)].map((_, index) => (
-            <View key={index} style={styles.roomCard}>
+          {filteredRuangan.map((ruangan) => (
+            <View key={ruangan.id} style={styles.roomCard}>
               <Image
-                source={{ uri: 'https://via.placeholder.com/80' }} // Replace with your image URL
+                source={{ uri: ruangan.gambar || 'https://via.placeholder.com/80' }} // Image from database or placeholder
                 style={styles.roomImage}
               />
               <View style={styles.roomDetails}>
-                <Text style={styles.roomName}>Ruang {activeTab === 'kelas' ? 'Kelas' : 'Meeting'} {index + 1}</Text>
-                <Text style={styles.roomCapacity}>Kapasitas: {30 + index} Orang</Text>
-                <Text style={styles.roomCampus}>Kampus: Kampus A</Text>
+                <Text style={styles.roomName}>Ruang {ruangan.nama}</Text>
+                <Text style={styles.roomCapacity}>Kapasitas: {ruangan.kapasitas} Orang</Text>
+                <Text style={styles.roomCampus}>Kampus: {ruangan.kampus}</Text>
               </View>
 
-              <TouchableOpacity style={styles.borrowButton} onPress={() => navigation.navigate('Info')}>
+              <TouchableOpacity style={styles.infoButton} onPress={() => navigation.navigate('Info', {
+                ruangan: { id: ruangan.id, nama: ruangan.nama } // Pass ruangan object
+              })}>
                 <Icon name="information-outline" size={24} color="white" padding={5} />
               </TouchableOpacity>
-
             </View>
           ))}
         </ScrollView>
@@ -181,7 +207,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: 'Poppins',
   },
-  borrowButton: {
+  infoButton: {
     backgroundColor: '#22ce83', // Button color
     justifyContent: 'center',
     alignItems: 'center',

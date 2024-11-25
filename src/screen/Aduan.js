@@ -1,15 +1,22 @@
+// Tambahkan import Firebase
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker'; 
-import { Picker } from '@react-native-picker/picker'; // Pastikan untuk menginstal react-native-picker
+import * as ImagePicker from 'expo-image-picker';
+import { Picker } from '@react-native-picker/picker';
+import { getDatabase, ref, push, get } from 'firebase/database';
+import app from '../../src/screen/firebase'; // Pastikan konfigurasi Firebase sudah benar
 
 export default function AduanScreen() {
   const [image, setImage] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState('');
+  const [rooms, setRooms] = useState([]); // State untuk menyimpan data ruangan
+  const [description, setDescription] = useState('');
+  const navigation = useNavigation();
 
-  // Request permission to access media library
   useEffect(() => {
+    // Meminta izin akses galeri
     (async () => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -18,10 +25,33 @@ export default function AduanScreen() {
         }
       }
     })();
+
+    // Fetch data ruangan dari Firebase
+    const fetchRooms = async () => {
+      const db = getDatabase(app);
+      const roomsRef = ref(db, 'ruangan'); // Pastikan path ini sesuai dengan Firebase
+
+      try {
+        const snapshot = await get(roomsRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const formattedRooms = Object.entries(data).map(([key, value]) => ({
+            id: key, // Gunakan key Firebase sebagai id
+            ...value,
+          }));
+          setRooms(formattedRooms);
+        } else {
+          console.log('Tidak ada data ditemukan.');
+        }
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+      }
+    };
+
+    fetchRooms();
   }, []);
 
   const pickImage = async () => {
-    // Open image picker
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -29,60 +59,96 @@ export default function AduanScreen() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);  // For SDK 48+ (new asset management)
+      setImage(result.assets[0].uri);
     }
   };
-    const [selectedRoom, setSelectedRoom] = useState('');
-    const [description, setDescription] = useState('');
-    const navigation = useNavigation();
-  
-    const handleSubmit = () => {
-      // Tambahkan logika untuk menangani pengiriman form
-      console.log("Ruangan:", selectedRoom);
-      console.log("Deskripsi:", description);
-  
-      // Menampilkan alert dengan tombol OK yang mengarahkan ke halaman Histori
+
+  const handleSubmit = async () => {
+    if (!selectedRoom || !description) {
+      Alert.alert('Form tidak lengkap', 'Harap lengkapi semua bidang sebelum mengirim.');
+      return;
+    }
+
+    try {
+      const db = getDatabase(app);
+      const aduanRef = ref(db, 'data_aduan'); // Referensi ke lokasi data "data_aduan"
+
+      const snapshot = await get(aduanRef);
+      const dataCount = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+
+      const newAduan = {
+        id: dataCount + 1,
+        ruangan: selectedRoom,
+        isi_aduan: description,
+        bukti_foto: image || '',
+        waktu: new Date().toISOString().slice(0, 10),
+        status_aduan: 'Sedang diproses'
+      };
+
+      const notificationData = {
+        judul: 'Pengaduan',
+        pesan: 'Pengaduan ruangan berhasil diajukan!',
+        tgl: new Date().toISOString().slice(0, 10),
+      };
+      const notificationRef = ref(db, 'notifikasi/');
+      await push(notificationRef, notificationData);
+
+      await push(aduanRef, newAduan);
+
       Alert.alert(
         'Pengaduan Terkirim!',
         'Pengaduan Anda telah berhasil dikirim.',
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Histori', { status: 'active' }), // Navigasi ke halaman Histori dengan parameter 'active'
+            onPress: () => navigation.navigate('Histori', { status: 'active' }),
           },
         ],
-        { cancelable: false } 
+        { cancelable: false }
       );
-    };
+
+      // Reset form
+      setSelectedRoom('');
+      setDescription('');
+      setImage(null);
+    } catch (error) {
+      console.error('Error saat mengirim pengaduan:', error);
+      Alert.alert('Error', 'Terjadi kesalahan saat mengirim pengaduan. Coba lagi nanti.');
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Baris untuk ikon undo, kotak pencarian, dan lonceng notifikasi */}
       <View style={styles.header}>
-        <Icon name="arrow-back" size={24} color="white" style={styles.icon} 
-        onPress={() => navigation.navigate('Beranda')}/>
+        <Icon
+          name="arrow-back"
+          size={24}
+          color="white"
+          style={styles.icon}
+          onPress={() => navigation.navigate('Beranda')}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder="Cari di sini..."
           placeholderTextColor="#999"
         />
-        <Icon name="notifications-outline" size={24} color="white" style={styles.icon} 
-        onPress={() => navigation.navigate('Notif')}/>
+        <Icon
+          name="notifications-outline"
+          size={24}
+          color="white"
+          style={styles.icon}
+          onPress={() => navigation.navigate('Notif')}
+        />
       </View>
 
-      {/* Kontainer untuk judul */}
       <View style={styles.titleContainer}>
         <Text style={styles.titleText}>Form Pengaduan</Text>
       </View>
 
-      {/* Kontainer utama (konten pengaduan) */}
       <View style={styles.whiteContainer}>
         <Text style={styles.formText}>Isi form di bawah ini</Text>
 
-        {/* Dropdown untuk memilih ruangan */}
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Pilih Ruangan</Text>
           <Picker
@@ -90,13 +156,16 @@ export default function AduanScreen() {
             onValueChange={(itemValue) => setSelectedRoom(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item label="Ruang A" value="ruang_a" />
-            <Picker.Item label="Ruang B" value="ruang_b" />
-            <Picker.Item label="Ruang C" value="ruang_c" />
+            {rooms.length > 0 ? (
+              rooms.map((ruangan) => (
+                <Picker.Item key={ruangan.id} label={ruangan.nama} value={ruangan.nama} />
+              ))
+            ) : (
+              <Picker.Item label="Tidak ada ruangan tersedia" value="" />
+            )}
           </Picker>
         </View>
 
-        {/* Textarea untuk deskripsi pengaduan */}
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Deskripsi Pengaduan</Text>
           <TextInput
@@ -105,20 +174,18 @@ export default function AduanScreen() {
             numberOfLines={4}
             placeholder="Deskripsi masalah yang Anda hadapi..."
             value={description}
-            onChangeText={text => setDescription(text)}
+            onChangeText={(text) => setDescription(text)}
           />
         </View>
 
-        {/* Kontainer untuk upload dokumen */}
         <View style={styles.inputContainer}>
           <Text style={styles.inputLabel}>Upload Dokumen</Text>
           <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
             <Icon name="cloud-upload-outline" size={24} color="white" />
-            <Text style={styles.uploadButtonText}> Bukti FotUnggaho</Text>
+            <Text style={styles.uploadButtonText}> Upload Bukti Foto</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Tombol Kirim */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Kirim</Text>
         </TouchableOpacity>

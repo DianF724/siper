@@ -1,49 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Untuk ikon
-import { useNavigation } from '@react-navigation/native'; // Untuk navigasi
-import { useFonts } from 'expo-font'; // Import font loading
+import Icon from 'react-native-vector-icons/Ionicons'; 
+import { useNavigation } from '@react-navigation/native'; 
+import { useFonts } from 'expo-font'; 
+import { database } from '../../src/screen/firebase.js'; // Ensure the path is correct
+import { ref, onValue } from 'firebase/database'; // Import Firebase methods
 
 export default function NotifScreen() {
   const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
-    'Poppins': require('./assets/fonts/Poppins-Regular.ttf'), // Ensure the path is correct
-    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'), // If you use bold as well
+    'Poppins': require('./assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
   });
 
-  // Sample data for notifications
-  const notifications = [
-    {
-      id: 1,
-      title: "Peminjaman Ruang D 1.1",
-      message: "Peminjaman ruang Anda telah dikonfirmasi.",
-      date: "21/02/2024",
-      status: "Selesai",
-    },
-    {
-      id: 2,
-      title: "Pengaduan AC",
-      message: "Pengaduan mengenai AC tidak menyala sedang ditindaklanjuti.",
-      date: "23/02/2024",
-      status: "Sedang Ditindaklanjuti",
-    },
-    {
-      id: 3,
-      title: "Peminjaman Ruang D 1.3",
-      message: "Peminjaman ruang D 1.3 telah selesai.",
-      date: "19/02/2024",
-      status: "Selesai",
-    },
-  ];
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Wait for fonts to load
+  useEffect(() => {
+    // Firebase reference to the 'notifications' node in the database
+    const notificationsRef = ref(database, 'notifikasi/');
+
+    // Listen for changes in the notifications data
+    const unsubscribe = onValue(notificationsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Transform the Firebase data into an array
+        const notificationsList = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key]
+        }));
+        setNotifications(notificationsList);
+      }
+      setLoading(false); // Data loaded, stop loading indicator
+    });
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
+  }, []);
+
   if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#2fa5d8" />; // Show loading indicator
+    return <ActivityIndicator size="large" color="#2fa5d8" />;
   }
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#2fa5d8" />;
+  }
+
+  // Function to determine the style based on notification type
+  const getCardStyle = (type) => {
+    switch (type) {
+      case 'Peminjaman':
+        return styles.cardPeminjaman;
+      case 'Pengaduan':
+        return styles.cardPengaduan;
+      default:
+        return styles.cardDefault;
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Bagian header */}
+      {/* Header */}
       <View style={styles.header}>
         <Icon name="arrow-back" size={24} color="white" style={styles.icon} 
           onPress={() => navigation.goBack()} 
@@ -53,23 +70,18 @@ export default function NotifScreen() {
         />
       </View>
 
-      {/* Konten utama (daftar notifikasi) */}
+      {/* Main Content (Notifications list) */}
       <ScrollView style={styles.scrollView}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Notifikasi</Text>
         </View>
 
         {notifications.map((notif) => (
-          <View key={notif.id} style={styles.card}>
-            <Text style={styles.cardText}>{notif.title}</Text>
-            <Text style={styles.cardDetail}>{notif.message}</Text>
+          <View key={notif.id} style={[styles.card, getCardStyle(notif.judul)]}>
+            <Text style={styles.cardText}>{notif.judul}</Text>
+            <Text style={styles.cardDetail}>{notif.pesan}</Text>
             <View style={styles.cardFooter}>
-              <Text style={styles.cardDate}>{notif.date}</Text>
-              <View style={styles.statusContainer(notif.status)}>
-                <Text style={styles.cardStatus}>
-                  {notif.status}
-                </Text>
-              </View>
+              <Text style={styles.cardDate}>{notif.tgl}</Text>
             </View>
           </View>
         ))}
@@ -79,6 +91,28 @@ export default function NotifScreen() {
 }
 
 const styles = StyleSheet.create({
+  
+  
+  
+  
+  
+  
+  cardPeminjaman: {
+    backgroundColor: '#2fa5d8', 
+  },
+  cardPengaduan: {
+    backgroundColor: '#22ce83', 
+  },
+  cardDefault: {
+    backgroundColor: '#e0e0e0', // Default gray color
+  },
+  
+  
+  
+
+
+
+
   container: {
     flex: 1,
     backgroundColor: '#2fa5d8',
@@ -107,7 +141,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: '#2fa5d8',
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
@@ -116,11 +149,11 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     color: 'white',
-    fontFamily: 'Poppins-Bold', // Use Poppins Bold
+    fontFamily: 'Poppins-Bold', 
   },
   cardDetail: {
     color: 'white',
-    fontFamily: 'Poppins', // Use Poppins Regular
+    fontFamily: 'Poppins', 
   },
   cardFooter: {
     flexDirection: 'row',
@@ -131,19 +164,9 @@ const styles = StyleSheet.create({
   cardDate: {
     color: 'white',
     fontSize: 12,
-    fontFamily: 'Poppins', // Use Poppins Regular
+    fontFamily: 'Poppins', 
   },
-  cardStatus: {
-    fontSize: 12,
-    color: 'white',
-    fontFamily: 'Poppins-Bold', // Use Poppins Regular
-  },
-  statusContainer: (status) => ({
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    backgroundColor: status === "Sedang Ditindaklanjuti" ? '#FFC727' : '#22ce83',
-  }),
+  
   titleContainer: {
     backgroundColor: 'white',
     paddingVertical: 15,

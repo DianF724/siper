@@ -6,8 +6,9 @@ import { useFonts } from 'expo-font';
 import Icon from 'react-native-vector-icons/Ionicons'; // Ikon untuk navbar
 import { View, ActivityIndicator } from 'react-native';
 
+
 // Mengimpor screen dari file lain
-import { Beranda, Histori, Pinjam, Laporan, Aduan, Perlengkapan, Notif, aduan_histori, FormPinjam, Info, Sukses } from './screen'; // Ganti sesuai jalur file Beranda.js, Histori.js, Pinjam.js
+import { Beranda, Histori, Pinjam,  Aduan, Perlengkapan, Notif, FormPinjam, Info, Sukses } from './screen'; // Ganti sesuai jalur file Beranda.js, Histori.js, Pinjam.js
 
 
 const Tab = createBottomTabNavigator();
@@ -111,11 +112,6 @@ export default function App() {
         <Stack.Screen 
           name="Notif" 
           component={Notif} 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name="aduan_histori" 
-          component={aduan_histori} 
           options={{ headerShown: false }} 
         />
         <Stack.Screen 

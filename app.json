@@ -1,27 +1,54 @@
 {
   "expo": {
-    "name": "ap",
-    "slug": "ap",
+    "name": "ap1",
+    "slug": "ap1",
+    "entryPoint": "./src/App",
+    "sdkVersion": "52.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/screen/assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/screen/assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMotionUsageDescription": "Needs Permission for Steps"
       }
     },
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./src/screen/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.dian724.ap1"
+    },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/screen/assets/favicon.png"
+    },
+    "plugins": [
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "15.1"
+          }
+        }
+      ]
+    ],
+    "packagerOpts": {
+      "sourceExts": [ "js", "json", "ts", "tsx", "jsx", "vue"],
+      "config": "metro.config.js"
     }
   }
 }

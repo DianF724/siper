@@ -41,7 +41,7 @@ export default function HomeScreen() {
 
         {/* Bagian Pilihan Menu */}
         <View style={styles.menuContainer}>
-          <Text style={styles.menuTitle}>Pilihan Menu</Text>
+          <Text style={styles.menuTitle}>Menu Fitur</Text>
 
           {/* Tombol-tombol menu */}
           <View style={styles.buttonRow}>

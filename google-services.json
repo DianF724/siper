@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "361979272454",
+    "project_id": "data-siper",
+    "storage_bucket": "data-siper.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361979272454:android:004ede1049025f406b1287",
+        "android_client_info": {
+          "package_name": "com.example.siper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGXK5lVH0LN6NIywmUluyIC5dsqqOdYd4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
