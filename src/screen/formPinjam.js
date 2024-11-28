@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   uploadButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CD38F',
     padding: 10,
     borderRadius: 10,
     marginTop: 20,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   cancelButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#e0372b',
     paddingVertical: 15,
     flex: 0.48,
     alignItems: 'center',

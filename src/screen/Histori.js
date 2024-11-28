@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   statusContainer: (status) => ({
-    backgroundColor: status === 'Menunggu Konfirmasi' ? '#FFB233' : '#A1C63D',
+    backgroundColor: status === 'Menunggu Konfirmasi' ? '#FFD455' : '#A1C63D',
     borderRadius: 10,
     paddingVertical: 5,
     paddingHorizontal: 10,

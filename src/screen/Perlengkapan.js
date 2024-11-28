@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
   },
   infoButton: {
-    backgroundColor: '#22ce83', // Button color
+    backgroundColor: '#27d68a', // Button color
     justifyContent: 'center',
     alignItems: 'center',
     width: 40, // Fixed width for square button

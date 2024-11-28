@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
   },
   submitButton: {
-    backgroundColor: '#22ce83',
+    backgroundColor: '#4CD38F',
     paddingVertical: 15,
     paddingHorizontal: 100,
     borderRadius: 10,

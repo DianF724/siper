@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   berandaButton: {
-    backgroundColor: '#FF3B30', // Warna tombol "Beranda"
+    backgroundColor: '#e0372b', // Warna tombol "Beranda"
   },
   laporanButton: {
     backgroundColor: '#2fa5d8', // Warna tombol "Laporan Peminjaman"
