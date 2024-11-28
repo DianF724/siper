@@ -7,8 +7,8 @@ Tujuan dibuatnya repository untuk Sistem Pengelolaan Ruangan adalah untuk menyed
 - Annisa Khairani : 09031282227133
 - Dian Febriansyah : 09031282227107
 - Intan Aidita Alfitrah : 09031282227101
-- Risma Nur'Aini : 09031282227127
 - Richi Nauli Juniarto Siregar : 09031282227109
+- Risma Nur'Aini : 09031282227127
 
 ## Project Status
 
