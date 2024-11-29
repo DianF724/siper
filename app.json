@@ -3,7 +3,6 @@
     "name": "ap1",
     "slug": "ap1",
     "entryPoint": "./src/App",
-    "sdkVersion": "52.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/screen/assets/icon.png",
@@ -25,7 +24,7 @@
         "foregroundImage": "./src/screen/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dian724.ap1"
+      "package": "com.example.siper"
     },
     "web": {
       "favicon": "./src/screen/assets/favicon.png"
@@ -47,8 +46,20 @@
       ]
     ],
     "packagerOpts": {
-      "sourceExts": [ "js", "json", "ts", "tsx", "jsx", "vue"],
+      "sourceExts": [
+        "js",
+        "json",
+        "ts",
+        "tsx",
+        "jsx",
+        "vue"
+      ],
       "config": "metro.config.js"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d2ecfd80-93a7-4ffa-b639-42493cbe4d4e"
+      }
     }
   }
 }
