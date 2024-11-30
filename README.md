@@ -41,7 +41,7 @@ Here's a description of the Streamlit functions and features that were created f
 - **Expo** : Version 51.0.28
 - **Babel**
 - **JavaScript**
-- **TypeScript**
+- **Gradle** : Version 8.10.2
 
 ## Setup
 
