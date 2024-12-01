@@ -12,7 +12,7 @@ Tujuan dibuatnya repository untuk Sistem Pengelolaan Ruangan adalah untuk menyed
 
 ## Project Status
 
-🚧 *Status*: In Progress!
+🚧 *Status*: Completed!
 
 ## Features
 
